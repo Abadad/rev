@@ -1,0 +1,2 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[45],{B2oN:function(e,t,a){"use strict";a.r(t),t.default={"2-5-1":{sendType:["event"],sa:{name:"click_view_more"},ga:{eventCategory:"推荐列表",eventAction:"ClickViewMore",eventLabel:""},handler:function(e){var t=e.sa,a=e.ga,n=(e.sensors,e.report),o=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{},r=o.target,i=void 0===r?null:r,s=(o.extraData,i&&i.getAttribute("data-reocmmend-name"));a.eventLabel=s,n({sa:t,ga:a})}}}}}]);
+//# sourceMappingURL=event-center-26.6ee8e1.js.map

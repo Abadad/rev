@@ -1,0 +1,257 @@
+// [AIV]  
+            /**
+             * version: 1.0.0 
+             * author: Sunnyson
+             * date: Friday, September 15th, 2017, 4:13:29 PM
+             * homepage: https://github.com/Sunnyson303/vue-infinite-scroll#readme
+             */
+            
+ (function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else if(typeof exports === 'object')
+		exports["InfiniteScroll"] = factory();
+	else
+		root["InfiniteScroll"] = factory();
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+/******/
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId]) {
+/******/ 			return installedModules[moduleId].exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			i: moduleId,
+/******/ 			l: false,
+/******/ 			exports: {}
+/******/ 		};
+/******/
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+/******/
+/******/ 		// Flag the module as loaded
+/******/ 		module.l = true;
+/******/
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/
+/******/
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+/******/
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+/******/
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+/******/
+/******/ 	// define getter function for harmony exports
+/******/ 	__webpack_require__.d = function(exports, name, getter) {
+/******/ 		if(!__webpack_require__.o(exports, name)) {
+/******/ 			Object.defineProperty(exports, name, {
+/******/ 				configurable: false,
+/******/ 				enumerable: true,
+/******/ 				get: getter
+/******/ 			});
+/******/ 		}
+/******/ 	};
+/******/
+/******/ 	// getDefaultExport function for compatibility with non-harmony modules
+/******/ 	__webpack_require__.n = function(module) {
+/******/ 		var getter = module && module.__esModule ?
+/******/ 			function getDefault() { return module['default']; } :
+/******/ 			function getModuleExports() { return module; };
+/******/ 		__webpack_require__.d(getter, 'a', getter);
+/******/ 		return getter;
+/******/ 	};
+/******/
+/******/ 	// Object.prototype.hasOwnProperty.call
+/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
+/******/
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "/dist/";
+/******/
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+var getComputedStyle = document.defaultView.getComputedStyle;
+var ctx = '@@infiniteScroll';
+
+function throttle(fn, delay) {
+  var timer, now, last;
+
+  function exec() {
+    fn();
+    last = now;
+  }
+  return function () {
+    if (timer) {
+      clearTimeout(timer);
+    }
+    now = Date.now();
+    var diff = now - last;
+    if (diff >= delay) {
+      exec();
+    } else {
+      timer = setTimeout(fn, diff);
+    }
+  };
+}
+
+function getElementTop(el) {
+  if (el === window) {
+    return getScrollTop(window);
+  }
+  return el.getBoundingClientRect().top + getScrollTop(el);
+}
+
+function getScrollTop(el) {
+  if (el === window) {
+    return Math.max(window.pageYOffset || 0, document.documentElement.scrollTop);
+  }
+  return el.scrollTop;
+}
+
+function getVisibleHeight(el) {
+  if (el === window) {
+    return document.documentElement.clientHeight;
+  }
+  return el.clientHeight;
+}
+
+function isVisible(el) {
+  return el.style.display !== 'none';
+}
+
+function getScrollEventTarget(el) {
+  var currentNode = el;
+  while (currentNode) {
+    if (currentNode && currentNode.tagName !== 'HTML' && currentNode.tagName !== 'BODY' && currentNode.nodeType == 1) {
+      var overflowY = getComputedStyle(currentNode).overflowY;
+      if (overflowY === 'scroll') {
+        return currentNode;
+      }
+    }
+    currentNode = currentNode.parentNode;
+  }
+  return window;
+}
+
+var doBind = function doBind() {
+  var context = this;
+  var distance = context.distance = parseInt(context.el.getAttribute('infinite-scroll-distance')) || 50;
+  var scrollEventTarget = getScrollEventTarget(context.el);
+  scrollEventTarget.addEventListener('scroll', throttle(doCheck.bind(context), 200));
+  var disabledState = context.el.getAttribute('infinite-scroll-disabled');
+  if (disabledState) {
+    context.vm.$watch(disabledState, function (value) {
+      context.disabled = value;
+      if (!value) {
+        doCheck.call(context);
+      }
+    });
+  }
+  context.disabled = false;
+};
+
+// const bailRE = /[^\w.$]/
+function parseNoDataPath(path) {
+  // if (bailRE.test(path)) {
+  //   return
+  // }
+  var segments = path.split('.');
+  return function (obj) {
+    for (var i = 0; i < segments.length; i++) {
+      if (!obj) return;
+      obj = obj[segments[i]];
+    }
+    return obj;
+  };
+}
+
+var doCheck = function doCheck() {
+  var context = this;
+
+  if (context.disabled) return false;
+
+  var distance = context.distance;
+  var scrollEventTarget = getScrollEventTarget(context.el);
+  var viewportBottom = getScrollTop(scrollEventTarget) + getVisibleHeight(scrollEventTarget);
+  var elementBottom = getElementTop(context.el) + getElementTop(scrollEventTarget) + context.el.offsetHeight;
+  var nodata = parseNoDataPath(context.el.getAttribute('infinite-scroll-nodata'))(context.vm);
+  var shouldTrigger = viewportBottom + distance > elementBottom ? true : false;
+
+  if (shouldTrigger && context.expression && !nodata && isVisible(context.el)) {
+    context.expression();
+  }
+};
+
+var directive = {
+  bind: function bind(el, binding, vnode, oldVnode) {
+    el[ctx] = {
+      el: el,
+      vm: vnode.context,
+      expression: binding.value
+    };
+
+    function tryBind() {
+      doBind.call(el[ctx]);
+    }
+    el[ctx].vm.$nextTick(tryBind);
+  }
+};
+
+exports.default = directive;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _directive = __webpack_require__(0);
+
+var _directive2 = _interopRequireDefault(_directive);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var infiniteScroll = {
+  install: function install(Vue, options) {
+    Vue.directive('infinite-scroll', _directive2.default);
+  }
+};
+
+if (window.Vue) {
+  Vue.use(infiniteScroll);
+}
+
+exports.default = infiniteScroll;
+
+/***/ })
+/******/ ]);
+}); 

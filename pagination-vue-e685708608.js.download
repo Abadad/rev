@@ -1,0 +1,243 @@
+"use strict";
+
+!function (e) {
+  function a(r) {
+    if (t[r]) return t[r].exports;
+    var n = t[r] = {
+      i: r,
+      l: !1,
+      exports: {}
+    };
+    return e[r].call(n.exports, n, n.exports, a), n.l = !0, n.exports;
+  }
+
+  var t = {};
+  a.m = e, a.c = t, a.i = function (e) {
+    return e;
+  }, a.d = function (e, t, r) {
+    a.o(e, t) || Object.defineProperty(e, t, {
+      configurable: !1,
+      enumerable: !0,
+      get: r
+    });
+  }, a.n = function (e) {
+    var t = e && e.__esModule ? function () {
+      return e.default;
+    } : function () {
+      return e;
+    };
+    return a.d(t, "a", t), t;
+  }, a.o = function (e, a) {
+    return Object.prototype.hasOwnProperty.call(e, a);
+  }, a.p = "", a(a.s = 0);
+}([function (e, a, t) {
+  "use strict";
+
+  if (window.Vue) {
+    var r = 0;
+    Vue.component("pagination-vue", {
+      props: {
+        change: {
+          type: Function,
+          default: null
+        },
+        counts: {
+          type: Number,
+          default: 0
+        },
+        value: {
+          type: Number,
+          default: 1
+        },
+        pageSize: Number,
+        simple: {
+          type: Boolean,
+          default: !0
+        },
+        rollPage: {
+          type: Number,
+          default: 5
+        },
+        lang: {
+          type: String,
+          default: "en"
+        }
+      },
+      data: function data() {
+        return {
+          language: {
+            en: {
+              Page: "Page",
+              of: "of"
+            },
+            de: {
+              Page: "Seite",
+              of: "auf"
+            },
+            es: {
+              Page: "Página",
+              of: "de"
+            },
+            fr: {
+              Page: "Page",
+              of: "sur"
+            }
+          }
+        };
+      },
+      render: function render(e) {
+        var a = this,
+            t = 1 == this.currPage ? e("li", {
+          class: "page-prev caret-disabled"
+        }, [" ◄ "]) : e("li", {
+          class: "page-prev",
+          on: {
+            click: this.prev
+          }
+        }, [" ◄ "]),
+            n = e("li", {
+          class: {
+            "page-current": 1 == this.currPage
+          }
+        }, [e("a", {
+          attrs: {
+            href: "javascript:;"
+          },
+          on: {
+            click: this.changePage.bind(this, 1)
+          }
+        }, ["1"])]),
+            s = function s(a) {
+          return e("li", {
+            key: "space-" + a
+          }, ["..."]);
+        },
+            i = this.currPage == this.totalPages ? e("li", {
+          class: "page-next caret-disabled"
+        }, [" ► "]) : e("li", {
+          on: {
+            click: this.next
+          },
+          class: "page-next"
+        }, [" ► "]),
+            c = this.simple ? "" : e("div", {
+          class: "page-txt visible-xl-inline-block"
+        }, [this.language[this.lang].Page, e("span", null, [this.currPage]), this.language[this.lang].of, e("span", null, [this.totalPages])]);
+
+        return e("div", {
+          class: "c-pagination"
+        }, [c, e("div", {
+          class: "page-opt"
+        }, [e("ul", {
+          class: "page-wrap clearfix"
+        }, [t, n, function () {
+          var t = [];
+          if (a.totalPages <= a.rollPage + 2) for (var n = 2; n <= a.totalPages; n++) {
+            t.push(e("li", {
+              class: {
+                last: n == a.totalPages,
+                "page-current": n == a.currPage
+              }
+            }, [e("a", {
+              attrs: {
+                href: "javascript:;"
+              },
+              on: {
+                click: a.changePage.bind(a, n)
+              }
+            }, [n])]));
+          } else {
+            if (a.currPage <= a.rollPage - 1) {
+              for (var n = 2; n <= a.rollPage + 1; n++) {
+                t.push(e("li", {
+                  class: {
+                    "page-current": a.currPage == n
+                  }
+                }, [e("a", {
+                  attrs: {
+                    href: "javascript:;"
+                  },
+                  on: {
+                    click: a.changePage.bind(a, n)
+                  }
+                }, [n])]));
+              }
+
+              t.push(s(r++));
+            } else if (a.currPage >= a.totalPages - a.rollPage && a.currPage <= a.totalPages) {
+              t.push(s(r++));
+
+              for (var n = a.totalPages - a.rollPage; n < a.totalPages; n++) {
+                t.push(e("li", {
+                  class: {
+                    "page-current": a.currPage == n
+                  }
+                }, [e("a", {
+                  attrs: {
+                    href: "javascript:;"
+                  },
+                  on: {
+                    click: a.changePage.bind(a, n)
+                  }
+                }, [n])]));
+              }
+            } else {
+              t.push(s(r++));
+
+              for (var n = a.currPage - 2; n <= a.currPage + 2; n++) {
+                t.push(e("li", {
+                  class: {
+                    "page-current": a.currPage == n
+                  }
+                }, [e("a", {
+                  attrs: {
+                    href: "javascript:;"
+                  },
+                  on: {
+                    click: a.changePage.bind(a, n)
+                  }
+                }, [n])]));
+              }
+
+              t.push(s(r++));
+            }
+
+            t.push(e("li", {
+              class: {
+                "page-current": a.currPage == a.totalPages
+              }
+            }, [e("a", {
+              attrs: {
+                href: "javascript:;"
+              },
+              on: {
+                click: a.changePage.bind(a, a.totalPages)
+              }
+            }, [a.totalPages])]));
+          }
+          return t;
+        }(), i])])]);
+      },
+      computed: {
+        totalPages: function totalPages() {
+          return parseInt(Math.ceil(this.counts / this.pageSize));
+        },
+        currPage: function currPage() {
+          return this.value;
+        }
+      },
+      watch: {},
+      methods: {
+        changePage: function changePage(e) {
+          this.$emit("input", e), this.change(e);
+        },
+        prev: function prev() {
+          this.changePage(this.currPage - 1);
+        },
+        next: function next() {
+          this.changePage(this.currPage + 1);
+        }
+      }
+    });
+  }
+}]);
